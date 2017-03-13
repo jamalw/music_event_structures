@@ -4,6 +4,7 @@ from scipy import stats
 import sys
 from nilearn.input_data import NiftiMasker
 import soundfile as sf
+import pickle
 
 subj = sys.argv[1]
 roi  = sys.argv[2]
