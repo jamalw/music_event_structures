@@ -40,8 +40,8 @@ avgsubjData2Horz = np.vstack(avgsubjData2)
 corrD    = corr2_coeff(subjData1Horz,subjData2Horz)
 avgCorrD = corr2_coeff(avgsubjData1Horz,avgsubjData2Horz)
 
-np.save(datadir + str(subj[0]) + '/' + 'corrD' + roi, corrD)
-np.save(datadir + str(subj[0]) + '/' + 'avgCorrD' + roi, avgCorrD)
+np.save(datadir + str(subj) + '/' + 'corrD' + roi, corrD)
+np.save(datadir + str(subj) + '/' + 'avgCorrD' + roi, avgCorrD)
 
 # compute average section of avgCorrD
 classical_within  = avgCorrD[0:8,0:8]
