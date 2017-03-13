@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pickle
 import numpy as np
 import sys
+from scipy import stats
 
 subj = sys.argv[1]
 roi = sys.argv[2]
@@ -69,7 +70,7 @@ ind = np.arange(N)
 width = 0.35
 labels = ['Classical vs Classical', 'Jazz vs Jazz', 'Jazz vs Classical', 'Classical vs Jazz']
 plt.xticks(ind + width / 2, labels)
-plt.bar(ind, allComparisonsAvg, width, color='k',yerr = allComparisonsSem,error_kw=dict(ecolor='lightseagreen',lw=3,capsize=0,capthick=0)))
+plt.bar(ind, allComparisonsAvg, width, color='k',yerr = allComparisonsSem,error_kw=dict(ecolor='lightseagreen',lw=3,capsize=0,capthick=0))
 plt.plot((0,3.5),(0,0),'k-')
 #allComparisonsStd = np.array([np.std(classical_within),np.std(jazz_within),np.std(classJazz_between),np.std(jazzClass_between)])
 plt.show()
