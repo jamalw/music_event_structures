@@ -63,10 +63,13 @@ plt.axis('tight')
 
 plt.figure(3)
 allComparisonsAvg = np.array([np.mean(classical_within),np.mean(jazz_within),np.mean(classJazz_between),np.mean(jazzClass_between)])
+allComparisonsSem = np.array([stats.sem(np.mean(classical_within,0)),stats.sem(np.mean(jazz_within,0)),stats.sem(np.mean(classJazz_between,0)),stats.sem(np.mean(jazzClass_between,0))])
 N = 4
 ind = np.arange(N)
 width = 0.35
-plt.bar(ind, allComparisonsAvg, width, color='k')
+labels = ['Classical vs Classical', 'Jazz vs Jazz', 'Jazz vs Classical', 'Classical vs Jazz']
+plt.xticks(ind + width / 2, labels)
+plt.bar(ind, allComparisonsAvg, width, color='k',yerr = allComparisonsSem,error_kw=dict(ecolor='lightseagreen',lw=3,capsize=0,capthick=0)))
 plt.plot((0,3.5),(0,0),'k-')
 #allComparisonsStd = np.array([np.std(classical_within),np.std(jazz_within),np.std(classJazz_between),np.std(jazzClass_between)])
 plt.show()
