@@ -6,11 +6,13 @@ from nilearn.input_data import NiftiMasker
 import soundfile as sf
 
 subj = sys.argv[1]
+roi  = sys.argv[2]
+roifilename = sys.argv[3]
 
 datadir = '/Users/jamalw/Desktop/PNI/music_event_structures/'
 
 # set data filenames
-mask_filename  = datadir + 'a1plus_2mm.nii'
+mask_filename  = datadir + roifilename
 fmri1_filename = datadir + 'subjects/' + subj + '/trans_filtered_func_data1.nii'
 fmri2_filename = datadir + 'subjects/' + subj + '/trans_filtered_func_data2.nii'
 
@@ -63,3 +65,5 @@ for i in range(len(exp1)):
     reorder1[exp1[i]] = func_sliced1[i][0]
     reorder2[exp2[i]] = func_sliced2[i][0]
 
+pickle.dump(reorder1, open(datadir + 'subjects/' + subj + '/' + 'reorder1' + roi,'wb'))
+pickle.dump(reorder2, open(datadir + 'subjects/' + subj + '/' + 'reorder2' + roi,'wb'))

@@ -3,7 +3,9 @@ import pickle
 import numpy as np
 
 
-subj = ['MES_022817_0']
+subj = sys.argv[1]
+roi = sys.argv[2]
+
 datadir = '/Users/jamalw/Desktop/PNI/music_event_structures/subjects/'
 
 def corr2_coeff(A,B):
@@ -21,8 +23,8 @@ def corr2_coeff(A,B):
 # take average and correlation for each subject pair
 for i in subj:
     # load in subject data (16 lists of #VxTRs for each song)
-    subjData1 = pickle.load(open(datadir + i + '/reorder1.p','rb'))
-    subjData2 = pickle.load(open(datadir + i + '/reorder2.p','rb'))
+    subjData1 = pickle.load(open(datadir + i + '/reorder1' + roi + '.p','rb'))
+    subjData2 = pickle.load(open(datadir + i + '/reorder2' + roi + '.p','rb'))
     # append average of each list to new array
     avgsubjData1 = []
     avgsubjData2 = []
@@ -39,8 +41,8 @@ avgsubjData2Horz = np.vstack(avgsubjData2)
 corrD    = corr2_coeff(subjData1Horz,subjData2Horz)
 avgCorrD = corr2_coeff(avgsubjData1Horz,avgsubjData2Horz)
 
-np.save(datadir + str(subj[0]) + '/' + 'corrD', corrD)
-np.save(datadir + str(subj[0]) + '/' + 'avgCorrD', avgCorrD)
+np.save(datadir + str(subj[0]) + '/' + 'corrD' + roi, corrD)
+np.save(datadir + str(subj[0]) + '/' + 'avgCorrD' + roi, avgCorrD)
 
 # compute average section of avgCorrD
 classical_within  = avgCorrD[0:8,0:8]
