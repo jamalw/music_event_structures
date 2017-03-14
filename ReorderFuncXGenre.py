@@ -66,5 +66,5 @@ for i in range(len(exp1)):
     reorder1[exp1[i]] = func_sliced1[i][0]
     reorder2[exp2[i]] = func_sliced2[i][0]
 
-pickle.dump(reorder1, open(datadir + 'subjects/' + subj + '/' + 'reorder1' + roi,'wb'))
-pickle.dump(reorder2, open(datadir + 'subjects/' + subj + '/' + 'reorder2' + roi,'wb'))
+pickle.dump(reorder1, open(datadir + 'subjects/' + subj + '/' + 'reorder1' + roi + '.p','wb'))
+pickle.dump(reorder2, open(datadir + 'subjects/' + subj + '/' + 'reorder2' + roi + '.p','wb'))
