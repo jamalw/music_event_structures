@@ -8,7 +8,7 @@ roi = sys.argv[1]
 subjs = ['MES_022817_0','MES_030217_0']
 datadir = '/Users/jamalw/Desktop/PNI/music_event_structures/subjects/'
 
-corrD3D = np.zeros((2600,2600,len(subjs)))
+corrD3D = np.zeros((1972,1972,len(subjs)))
 avgCorrD3D = np.zeros((16,16,len(subjs)))
 
 for i in range(len(subjs)):
@@ -44,7 +44,7 @@ pl.text(-300,1800,labels[1],rotation='vertical')
 pl.text(1800,2800,labels[1])
 pl.text(2650,1800,labels[1],rotation='270')
 pl.text(900.5, -200,'Full Correlation Matrix',fontweight='bold')
-plt.savefig('FullCorrMat_N' + roi + str(len(subjs)))
+plt.savefig('FullCorrMat_N' + str(len(subjs)) + roi)
 
 plt.figure(2,facecolor="1")
 ax = plt.gca()
@@ -64,7 +64,7 @@ pl.text(15.75,10.75,labels[1],rotation='270')
 pl.text(10.75,17,labels[1])
 pl.text(18,17,'N='+ str(len(subjs)),fontweight='bold')
 plt.text(3.75,-1.75,'Average Within-Song Correlation',fontweight='bold')
-plt.savefig('AvgCorrMat_N' + roi + str(len(subjs)))
+plt.savefig('AvgCorrMat_N' + str(len(subjs)) + roi)
 
 plt.figure(3,facecolor="1")
 allComparisonsAvg = np.array([np.mean(classical_within),np.mean(jazz_within),np.mean(classJazz_between),np.mean(jazzClass_between)])
@@ -80,7 +80,7 @@ plt.xticks(ind + width / 2,labels)
 plt.plot((0,3.5),(0,0),'k-')
 pl.text(18,17,'N=2',fontweight='bold')
 #allComparisonsStd = np.array([np.std(classical_within),np.std(jazz_within),np.std(classJazz_between),np.std(jazzClass_between)])
-plt.savefig('AvgGenreSim_N' + roi + str(len(subjs)))
+plt.savefig('AvgGenreSim_N' + str(len(subjs)) + roi) 
 
 # Plot average Within song and Between song comparison
 plt.figure(4,facecolor="1")
@@ -97,7 +97,7 @@ labels = ['Same Song','Different Song']
 plt.xticks(ind + width / 2,labels)
 plt.plot((0,1.5),(0,0),'k-')
 pl.text(18,17,'N=2',fontweight='bold')
-plt.savefig('AvgSongSim_N' + roi + str(len(subjs)))
+plt.savefig('AvgSongSim_N' + str(len(subjs)) + roi)
 
 # Plot average Within song and Between song correlation for each genre
 plt.figure(5,facecolor="1")
@@ -129,7 +129,7 @@ labels = ['Classical Within','Classical Between','Jazz Within', 'Jazz Between']
 plt.xticks(ind + width / 2,labels)
 plt.plot((0,1.5),(0,0),'k-')
 pl.text(18,17,'N=2',fontweight='bold')
-plt.savefig('WithinGenreOnOffDiag_N' + roi + str(len(subjs)))
+plt.savefig('WithinGenreOnOffDiag_N' + str(len(subjs)) + roi)
 
 
 
