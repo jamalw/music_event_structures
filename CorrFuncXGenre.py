@@ -38,7 +38,7 @@ avgsubjData1Horz = np.vstack(avgsubjData1)
 avgsubjData2Horz = np.vstack(avgsubjData2)
 
 # perform correlation on full data and average data
-corrD    = corr2_coeff(subjData1Horz,subjData2Horz)
+corrD    = corr2_coeff(subjData1Horz.T,subjData2Horz.T)
 avgCorrD = corr2_coeff(avgsubjData1Horz,avgsubjData2Horz)
 
 np.save(datadir + str(subj) + '/' + 'corrD' + roi, corrD)

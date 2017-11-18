@@ -3,12 +3,13 @@ import numpy as np
 import pylab as pl
 import scipy as sp
 from scipy import stats
+import sys
 
 roi = sys.argv[1]
 subjs = ['MES_022817_0','MES_030217_0']
 datadir = '/Users/jamalw/Desktop/PNI/music_event_structures/subjects/'
 
-corrD3D = np.zeros((1972,1972,len(subjs)))
+corrD3D = np.zeros((2511,2511,len(subjs)))
 avgCorrD3D = np.zeros((16,16,len(subjs)))
 
 for i in range(len(subjs)):
@@ -33,16 +34,16 @@ plt.axis('tight')
 ax = plt.gca()
 plt.plot((ax.get_ylim()[0],ax.get_ylim()[1]),(ax.get_xlim()[1],ax.get_xlim()[0]),"k-")
 pl.text(2800,2800,'N='+ str(len(subjs)),fontweight='bold')
-plt.plot((-.5, 2600.5), (1300.5, 1300.5), 'k-')
-plt.plot((1300.5, 1300.5), (-.5, 2600.5), 'k-')
+plt.plot((-.5, 2600.5), (1255.5, 1255.5), 'k-')
+plt.plot((1255.5, 1255.5), (-.5, 2600.5), 'k-')
 pl.text(500,-70,labels[0])
 pl.text(500,2800,labels[0])
-pl.text(2650,500,labels[0],rotation='270')
+pl.text(2550,500,labels[0],rotation='270')
 pl.text(-300,500,labels[0],rotation='vertical')
 pl.text(1800,-70,labels[1])
 pl.text(-300,1800,labels[1],rotation='vertical')
 pl.text(1800,2800,labels[1])
-pl.text(2650,1800,labels[1],rotation='270')
+pl.text(2550,1800,labels[1],rotation='270')
 pl.text(900.5, -200,'Full Correlation Matrix',fontweight='bold')
 plt.savefig('FullCorrMat_N' + str(len(subjs)) + roi)
 

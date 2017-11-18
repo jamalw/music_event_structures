@@ -14,8 +14,8 @@ import random
 import numpy as np
 
 # CHANGE FOR EVERY SUBJECT. ESPECIALLY THE RECOG FILE NAME
-subj_id = 'MES_022817_0'
-day = '1'
+subj_id = 'MES_060117_1'
+day = '3'
 
 subject_filename = '/Users/jamalw/Desktop/PNI/music_event_structures/subjects/' + subj_id + '/' + subj_id + '_recogtest' + day + '.log'
 

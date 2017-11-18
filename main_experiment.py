@@ -15,8 +15,8 @@ import numpy as np
 import os
 
 # CHANGE FOR EVERY SUBJECT AND SECTION OF SCAN
-subj_id = 'MES_060117_1'
-run = '2'
+subj_id = 'test'
+run = '1'
 subject_filename = '/Users/jamalw/Desktop/PNI/music_event_structures/subjects/' + subj_id + '/' + subj_id + '_' + 'main_experiment' + run + '.log'
 
 def log_msg(msg, filename=subject_filename):
@@ -48,7 +48,7 @@ infoDlg = gui.DlgFromDict(MR_settings, title='fMRI parameters', order=['TR', 'vo
 if not infoDlg.OK:
     core.quit()
 
-win = visual.Window(fullscr=True)
+win = visual.Window(fullscr=False)
 globalClock = core.Clock()
 
 # summary of run timing, for each key press:

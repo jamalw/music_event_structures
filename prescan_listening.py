@@ -15,8 +15,8 @@ import numpy as np
 import os
 
 # CHANGE FOR EVERY SUBJECT. ESPECIALLY THE PRESCAN FILE NAME
-subj_id = 'MES_022817_0'
-day = '1'
+subj_id = 'MES_060117_1'
+day = '2'
 
 os.system("mkdir '/Users/jamalw/Desktop/PNI/music_event_structures/subjects/'" + subj_id)
 subject_filename = '/Users/jamalw/Desktop/PNI/music_event_structures/subjects/' + subj_id + '/' + subj_id + '_prescan_num' + day + '.log'
