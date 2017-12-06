@@ -43,7 +43,7 @@ def searchlight(X1,coords,K,mask,loo_idx):
 
     """
 
-    stride = 5*40
+    stride = 5
     radius = 5
     min_vox = 10
     nPerm = 1000
@@ -64,8 +64,8 @@ def searchlight(X1,coords,K,mask,loo_idx):
               print("Running Searchlight")
               SL_within_across = HMM(data,K,loo_idx)
               print('SL_within_across: ',SL_within_across)
-              if np.any(np.isnan(SL_within_across)):
-                 continue
+              #if np.any(np.isnan(SL_within_across)):
+              #   continue
               SL_results.append(SL_within_across)
               SL_allvox.append(np.array(np.nonzero(SL_vox)[0]))
     voxmean = np.zeros((coords.shape[0], nPerm+1))
@@ -142,7 +142,7 @@ def HMM(X,K,loo_idx):
         perm_lengths = np.random.permutation(event_lengths)
         np.random.seed(p)
         events = np.zeros(nTR, dtype=np.int)
-        events[np.cumsum(perm_lengths[:-1])] = 1
+        events[np.random.choice(nTR,K-1,replace=False)] = 1
         events = np.cumsum(events)
 
     return within_across
@@ -166,7 +166,7 @@ for i in k_sweeper:
     z = np.reshape(z,(z.shape[0]*z.shape[1]*z.shape[2]))
     coords = np.vstack((x,y,z)).T 
     coords_mask = coords[mask_reshape>0]
-    #print('Running Searchlight...')
+    print('Running Distribute...')
     voxmean = searchlight(runs, coords_mask,i,mask,loo_idx) 
     results3d[mask>0] = voxmean
     print('Saving ' + subj + ' to Searchlight Folder')
