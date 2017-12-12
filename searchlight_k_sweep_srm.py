@@ -64,7 +64,7 @@ def searchlight(X1,coords,K,mask,loo_idx):
               for i in range(len(X1)):
                   X1_i = np.zeros((SL_positions.shape[0],2511))
                   for v_ind in range(SL_positions.shape[0]):
-                      X1_i[v_ind,:] = X1[i].dataobj[tuple([int(x) for x in SL_positions[v_ind]])]    
+                      X1_i[v_ind,:] = X1[i].dataobj[tuple([int(x) for x in SL_positions[v_ind]])][0:2511]    
                   data.append(np.nan_to_num(stats.zscore(X1_i,axis=1,ddof=1)))
               print("Running Searchlight")
               SL_within_across = HMM(data,K,loo_idx)
