@@ -59,8 +59,13 @@ def searchlight(X1,coords,K,mask,loo_idx):
               SL_mask = np.zeros(X1[0].shape[:-1],dtype=bool)
               SL_mask[mask > 0] = SL_vox
               data = []
+              SL_positions = np.transpose(np.nonzero(SL_mask))
+              print("Assigning to Data Object")
               for i in range(len(X1)):
-                  data.append(np.nan_to_num(stats.zscore(X1[i].get_data()[SL_mask,0:2511],axis=1,ddof=1)))
+                  X1_i = np.zeros((SL_positions.shape[0],2511))
+                  for v_ind in range(SL_positions.shape[0]):
+                      X1_i[v_ind,:] = X1[i].dataobj[tuple([int(x) for x in SL_positions[v_ind]])]    
+                  data.append(np.nan_to_num(stats.zscore(X1_i,axis=1,ddof=1)))
               print("Running Searchlight")
               SL_within_across = HMM(data,K,loo_idx)
               print('SL_within_across: ',SL_within_across)
@@ -103,7 +108,7 @@ def HMM(X,K,loo_idx):
 
     """
     
-    w = 2
+    w = 10
     nPerm = 1000
     within_across = np.zeros(nPerm+1)
     run1 = [X[i] for i in np.arange(0, int(len(X)/2))]
