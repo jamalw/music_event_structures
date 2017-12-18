@@ -22,7 +22,7 @@ mask_reshape = np.reshape(mask,(91*109*91))
 global_outputs_all = np.zeros((91,109,91))
 results3d = np.zeros((91,109,91,1001))
 
-def searchlight(X1,coords,K,mask,loo_idx):
+def searchlight(coords,K,mask,loo_idx,subjs):
     
     """run searchlight 
 
@@ -49,36 +49,28 @@ def searchlight(X1,coords,K,mask,loo_idx):
     nPerm = 1000
     SL_allvox = []
     SL_results = []
-    for x in range(np.random.randint(stride),np.max(coords, axis=0)[0]+stride,stride):
-        for y in range(np.random.randint(stride),np.max(coords, axis=0)[1]+stride,stride):
-           for z in range(np.random.randint(stride),np.max(coords, axis=0)[2]+stride,stride):
-              D = np.sqrt(np.square(coords - np.array([x,y,z])[np.newaxis,:]).sum(1))
-              SL_vox = D <= radius
-              if np.sum(SL_vox) < min_vox:
-                 continue
-              SL_mask = np.zeros(X1[0].shape[:-1],dtype=bool)
-              SL_mask[mask > 0] = SL_vox
-              data = []
-              SL_positions = np.transpose(np.nonzero(SL_mask))
-              print("Assigning to Data Object")
-              for i in range(len(X1)):
-                  X1_i = np.zeros((SL_positions.shape[0],2511))
-                  for v_ind in range(SL_positions.shape[0]):
-                      X1_i[v_ind,:] = X1[i].dataobj[tuple([int(x) for x in SL_positions[v_ind]])][0:2511]    
-                  data.append(np.nan_to_num(stats.zscore(X1_i,axis=1,ddof=1)))
-              print("Running Searchlight")
-              SL_within_across = HMM(data,K,loo_idx)
-              print('SL_within_across: ',SL_within_across)
-              #if np.any(np.isnan(SL_within_across)):
-              #   continue
-              SL_results.append(SL_within_across)
-              SL_allvox.append(np.array(np.nonzero(SL_vox)[0]))
+    datadir = '/tigress/jamalw/MES/prototype/link/scripts/data/searchlight_input/'
+    for x in range(0,np.max(coords, axis=0)[0]+stride,stride):
+        for y in range(0,np.max(coords, axis=0)[1]+stride,stride):
+           for z in range(0,np.max(coords, axis=0)[2]+stride,stride):
+               data = []
+               try: 
+                   for i in range(len(subjs)):
+                       subj_data = np.load(datadir + subjs[i] + '/' + str(x) + '_' + str(y) + '_' + str(z) + '.npy')
+                       data.append(np.nan_to_num(stats.zscore(subj_data[:,:,0]),axis=1,ddof=1))
+                       print('Data Shape',len(data))
+                   for i in range(len(subjs)):
+                       subj_data = np.load(datadir + subjs[i] + '/' + str(x) + '_' + str(y) + '_' + str(z) + '.npy')
+                       data.append(np.nan_to_num(stats.zscore(subj_data[:,:,1]),axis=1,ddof=1)) 
+                   print("Running Searchlight")
+                   SL_within_across = HMM(data,K,loo_idx)
+                   print('SL_within_across: ',SL_within_across)
+                   SL_results.append(SL_within_across)
+                   SL_allvox.append(np.array(np.nonzero(SL_vox)[0])) 
+               except Exception:
+                   continue          
     voxmean = np.zeros((coords.shape[0], nPerm+1))
     vox_SLcount = np.zeros(coords.shape[0])
-    np.save('voxmean',voxmean)
-    np.save('vox_SLcount',vox_SLcount)
-    np.save('SL_results',SL_results)
-    np.save('SL_allvox',SL_allvox)
     for sl in range(len(SL_results)):
        voxmean[SL_allvox[sl],:] += SL_results[sl]
        vox_SLcount[SL_allvox[sl]] += 1
@@ -152,27 +144,17 @@ def HMM(X,K,loo_idx):
 
     return within_across
 
-runs = []
-
-# Load functional data and mask data
-for j in range(len(subjs)):
-    data_run1 = nib.load(datadir + 'subjects/' + subjs[j] + '/analysis/run1.feat/trans_filtered_func_data.nii')
-    runs.append(data_run1)
-    
-for j in range(len(subjs)):
-    data_run2 = nib.load(datadir + 'subjects/' + subjs[j] + '/analysis/run2.feat/trans_filtered_func_data.nii')
-    runs.append(data_run2)
 
 for i in k_sweeper:
     # create coords matrix
-    x,y,z = np.mgrid[[slice(dm) for dm in runs[0].shape[0:3]]]
+    x,y,z = np.mgrid[[slice(dm) for dm in tuple((91,109,91))]]
     x = np.reshape(x,(x.shape[0]*x.shape[1]*x.shape[2]))
     y = np.reshape(y,(y.shape[0]*y.shape[1]*y.shape[2]))
     z = np.reshape(z,(z.shape[0]*z.shape[1]*z.shape[2]))
     coords = np.vstack((x,y,z)).T 
     coords_mask = coords[mask_reshape>0]
     print('Running Distribute...')
-    voxmean = searchlight(runs, coords_mask,i,mask,loo_idx) 
+    voxmean = searchlight(coords_mask,i,mask,loo_idx,subjs) 
     results3d[mask>0] = voxmean
     print('Saving ' + subj + ' to Searchlight Folder')
     np.save(datadir + 'prototype/link/scripts/data/searchlight_output/HMM_searchlight_K_sweep_srm/globals_loo_' + subj + '_K_' + str(i), results3d)
