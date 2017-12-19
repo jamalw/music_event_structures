@@ -5,6 +5,8 @@ from nilearn.image import load_img
 import sys
 from brainiak.funcalign.srm import SRM
 import nibabel as nib
+import os
+from scipy.spatial import distance
 
 subjs = ['MES_022817_0','MES_030217_0','MES_032117_1','MES_040217_0','MES_041117_0','MES_041217_0','MES_041317_0','MES_041417_0','MES_041517_0','MES_042017_0','MES_042317_0','MES_042717_0','MES_050317_0','MES_051317_0','MES_051917_0','MES_052017_0','MES_052017_1','MES_052317_0','MES_052517_0','MES_052617_0','MES_052817_0','MES_052817_1','MES_053117_0','MES_060117_0','MES_060117_1']
 
@@ -53,22 +55,23 @@ def searchlight(coords,K,mask,loo_idx,subjs):
     for x in range(0,np.max(coords, axis=0)[0]+stride,stride):
         for y in range(0,np.max(coords, axis=0)[1]+stride,stride):
            for z in range(0,np.max(coords, axis=0)[2]+stride,stride):
+               if not os.path.isfile(datadir + subjs[0] + '/' + str(x) + '_' + str(y) + '_' + str(z) + '.npy'):
+                   continue
+               D = distance.cdist(coords,np.array([x,y,z]).reshape((1,3)))[:,0]
+               SL_vox = D <= radius
                data = []
-               try: 
-                   for i in range(len(subjs)):
-                       subj_data = np.load(datadir + subjs[i] + '/' + str(x) + '_' + str(y) + '_' + str(z) + '.npy')
-                       data.append(np.nan_to_num(stats.zscore(subj_data[:,:,0]),axis=1,ddof=1))
-                       print('Data Shape',len(data))
-                   for i in range(len(subjs)):
-                       subj_data = np.load(datadir + subjs[i] + '/' + str(x) + '_' + str(y) + '_' + str(z) + '.npy')
-                       data.append(np.nan_to_num(stats.zscore(subj_data[:,:,1]),axis=1,ddof=1)) 
-                   print("Running Searchlight")
-                   SL_within_across = HMM(data,K,loo_idx)
-                   print('SL_within_across: ',SL_within_across)
-                   SL_results.append(SL_within_across)
-                   SL_allvox.append(np.array(np.nonzero(SL_vox)[0])) 
-               except Exception:
-                   continue          
+               for i in range(len(subjs)):
+                   subj_data = np.load(datadir + subjs[i] + '/' + str(x) + '_' + str(y) + '_' + str(z) + '.npy')
+                   data.append(np.nan_to_num(stats.zscore(subj_data[:,:,0],axis=1,ddof=1)))
+                   print('Data Shape',len(data))
+               for i in range(len(subjs)):
+                   subj_data = np.load(datadir + subjs[i] + '/' + str(x) + '_' + str(y) + '_' + str(z) + '.npy')
+                   data.append(np.nan_to_num(stats.zscore(subj_data[:,:,1],axis=1,ddof=1))) 
+               print("Running Searchlight")
+               SL_within_across = HMM(data,K,loo_idx)
+               print('SL_within_across: ',SL_within_across)
+               SL_results.append(SL_within_across)
+               SL_allvox.append(np.array(np.nonzero(SL_vox)[0])) 
     voxmean = np.zeros((coords.shape[0], nPerm+1))
     vox_SLcount = np.zeros(coords.shape[0])
     for sl in range(len(SL_results)):
