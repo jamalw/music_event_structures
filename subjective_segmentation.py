@@ -49,11 +49,12 @@ def log_csv(timestamp, button_choice):
 log_msg('Log filename:' + subject_filename)
 
 # Prepare music
-song_dir = '/Users/jamalw/Desktop/PNI/music_event_structures/' + 'all_songs_part' + run + '.npy'
-songs = np.load(song_dir)
+songs = glob.glob('/Users/jamalw/Desktop/PNI/music_event_structures/songs/*.wav')
+np.random.shuffle(songs)
 f = open('/Users/jamalw/Desktop/PNI/music_event_structures/prompts/MES_instructions.txt','r')
 file_contents = f.read()
-
+song_break = open('/Users/jamalw/Desktop/PNI/music_event_structures/prompts/song_break.txt','r')
+song_break = song_break.read()
 # settings for launchScan:
 
 infoDlg = gui.DlgFromDict(MR_settings, title='fMRI parameters', order=['TR', 'volumes'])
@@ -69,6 +70,9 @@ for i in range(-1 * MR_settings['skip'], 0):
     output += u'%d prescan skip (no sync)\n' % i
 
 counter = visual.TextStim(win, height=.15, pos=(0, 0), color=win.rgb + 0.5)
+
+# set window handler for questions
+song_break_handler = visual.TextStim(win, height=.06, pos=(0, 0), color=win.rgb + 0.5)
 
 # set window handler for finish
 finish = visual.TextStim(win, height=.06, pos=(0, 0), color=win.rgb + 0.5)
@@ -99,28 +103,68 @@ duration = MR_settings['volumes'] * MR_settings['TR']
 # note: globalClock has been reset to 0.0 by launchScan()
 ##
 song_idx = -1
+q_idx = -1
+in_q_phase = False
+qphase_complete = False
+qs = [song_break]
+n_questions = len(qs)
+did_respond_to_q = True
 ##
 while globalClock.getTime() < duration:
     
     if song_idx==-1 or current_song.status == -1: # the current song has stopped, i.e. it finished
         log_msg(u'%3d  %7.3f ending song %d:\n' % (vol, globalClock.getTime(), song_idx ))
-        song_idx += 1
-        if song_idx == len(songs):
-            break
-        current_song = sound.Sound(os.path.join(songs[song_idx]))
-        song_t0 = time.time()
-        current_song.play() 
-        log_msg(u'%3d  %7.3f playing song %d: %s\n' % (vol, globalClock.getTime(), song_idx, songs[song_idx]))
+        if (song_idx!=-1 and current_song.status == -1) and (not in_q_phase) and (not qphase_complete):
+            # start the song break
+            q_idx = -1
+            in_q_phase = True
+            did_respond_to_q = True
+        elif in_q_phase:
+            pass
+        else:
+            # start a new song
+            song_idx += 1
+            if song_idx == len(songs):
+                break
+            current_song = sound.Sound(os.path.join(songs[song_idx]))
+            song_t0 = time.time()
+            current_song.play() 
+            log_msg(u'%3d  %7.3f playing song %d: %s\n' % (vol, globalClock.getTime(), song_idx, songs[song_idx]))
+            
+    if in_q_phase and did_respond_to_q:
+        q_idx += 1
+        if q_idx == n_questions:
+            in_q_phase = False
+            qphase_complete = True
+            counter.setText('+')
+            counter.draw()
+            win.flip()
+        else:
+            song_break_handler.setText(qs[q_idx])
+            song_break_handler.draw()
+            win.flip()
+            log_msg(u'%3d  %7.3f %s\n' % (vol, globalClock.getTime(), qs[q_idx]))
+        did_respond_to_q = False
+            
+            
     allKeys = event.getKeys()
     for key in allKeys:
-        # handle keys (many fiber-optic buttons become key-board key-presses)
-        log_msg(u"%3d  %7.3f %s\n" % (vol-1, globalClock.getTime(), unicode(key)))
         timestamp = globalClock.getTime()
         button_choice = unicode(key)
         log_csv(timestamp, button_choice)
-        if key == 'escape':
-            log_msg(u'user cancel, ')
-            break
+        if key == MR_settings['sync']:
+            onset = globalClock.getTime()
+            # handle keys (many fiber-optic buttons become key-board key-presses)
+            log_msg(u"%3d  %7.3f sync\n" % (vol, onset))
+            vol += 1
+        else:
+            # handle keys (many fiber-optic buttons become key-board key-presses)
+            log_msg(u"%3d  %7.3f %s\n" % (vol-1, globalClock.getTime(), unicode(key)))
+            if key in ['p']:
+                did_respond_to_q = True
+            elif key == 'escape':
+                log_msg(u'user cancel, ')
+                break
                 
 finish.setText('This concludes the scanning session')
 finish.draw()
